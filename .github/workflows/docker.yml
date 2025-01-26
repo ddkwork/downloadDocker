@@ -1,0 +1,26 @@
+name: 下载、打包并上传 Docker 镜像到 GitHub Actions
+
+on:
+  push:
+    branches:
+      - master  # 你可以根据需要更改触发分支
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v2
+
+      - name: 拉取 Docker 镜像
+        run: docker pull raymii/qt:5.15-android-source
+
+      - name: 打包 Docker 镜像
+        run: docker save -o raymii-qt-5.15-android-source.tar raymii/qt:5.15-android-source
+
+      - name: 上传 Docker 镜像到 GitHub Actions
+        uses: actions/upload-artifact@v3
+        with:
+          name: raymii-qt-5.15-android-source.tar
+          path: raymii-qt-5.15-android-source.tar
