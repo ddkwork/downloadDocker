@@ -17,10 +17,10 @@ jobs:
         run: docker pull raymii/qt:5.15-android-source
 
       - name: 打包 Docker 镜像
-        run: docker save -o raymii-qt-5.15-android-source.tar raymii/qt:5.15-android-source
+        run: docker save -o /tmp/ raymii-qt-5.15-android-source.tar raymii/qt:5.15-android-source
 
       - name: 上传 Docker 镜像到 GitHub Actions
         uses: actions/upload-artifact@v3
         with:
           name: raymii-qt-5.15-android-source.tar
-          path: raymii-qt-5.15-android-source.tar
+          path: /tmp/raymii-qt-5.15-android-source.tar
