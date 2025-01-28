@@ -3,7 +3,7 @@ name: 下载、打包并上传 Docker 镜像到 GitHub Actions
 on:
   push:
     branches:
-      - master  # 你可以根据需要更改触发分支
+      - master  # 根据需要更改触发分支
 
 jobs:
   build-and-upload:
@@ -13,14 +13,26 @@ jobs:
       - name: 检出仓库
         uses: actions/checkout@v2
 
-      - name: 拉取 Docker 镜像
-        run: docker pull raymii/qt:5.15-android-source
+      - name: 登录 Docker Hub（如果需要）
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: 打包 Docker 镜像
-        run: docker save -o /tmp/raymii-qt-5.15-android-source.tar raymii/qt:5.15-android-source
+      - name: 拉取并优化 Docker 镜像
+        run: |
+          docker pull raymii/qt:5.15-android-source
+          docker tag raymii/qt:5.15-android-source yourusername/optimized-qt:5.15-android-source
+          docker build --squash -t yourusername/optimized-qt:5.15-android-source .
+          docker push yourusername/optimized-qt:5.15-android-source
 
-      - name: 上传 Docker 镜像到 GitHub Actions
+      - name: 打包并压缩 Docker 镜像
+        run: |
+          docker pull yourusername/optimized-qt:5.15-android-source
+          docker save yourusername/optimized-qt:5.15-android-source | gzip > /tmp/optimized-qt.tar.gz
+
+      - name: 上传压缩后的 Docker 镜像到 GitHub Actions
         uses: actions/upload-artifact@v3
         with:
-          name: raymii-qt-5.15-android-source.tar
-          path: /tmp/raymii-qt-5.15-android-source.tar
+          name: optimized-qt.tar.gz
+          path: /tmp/optimized-qt.tar.gz
